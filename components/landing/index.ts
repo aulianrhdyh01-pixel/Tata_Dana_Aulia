@@ -1,0 +1,9 @@
+export { Navbar } from './navbar';
+export { Hero } from './hero';
+export { ProblemSolution } from './problem-solution';
+export { FeatureBlocks } from './feature-blocks';
+export { Testimonials } from './testimonials';
+export { PricingSection } from './pricing-section';
+export { FaqAccordion } from './faq-accordion';
+export { FinalCta } from './final-cta';
+export { Footer } from './footer';

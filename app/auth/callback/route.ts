@@ -1,0 +1,21 @@
+// ==============================================================================
+// TataDana: Auth Callback Route Handler (OAuth & Magic Link Exchange)
+// ==============================================================================
+
+import { NextResponse } from 'next/server';
+import { createServerClient } from '@/lib/supabase/server';
+
+export async function GET(request: Request) {
+  const requestUrl = new URL(request.url);
+  const code = requestUrl.searchParams.get('code');
+  const next = requestUrl.searchParams.get('next') || '/dashboard';
+
+  if (code) {
+    const supabase = await createServerClient();
+    if (supabase.auth?.exchangeCodeForSession) {
+      await supabase.auth.exchangeCodeForSession(code);
+    }
+  }
+
+  return NextResponse.redirect(new URL(next, requestUrl.origin));
+}
