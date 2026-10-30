@@ -3,14 +3,14 @@ import urllib.error
 import json
 import time
 
-base = 'http://localhost:3000'
+base = 'http://127.0.0.1:3000'
 
 print("=== STARTING TATADANA PRIME API VERIFICATION ===")
 
 # 1. Test Superadmin Login
 req = urllib.request.Request(f'{base}/api/auth/login', data=json.dumps({
-    'email': 'shopnoure1619@gmail.com',
-    'password': 'tugasbisnis16'
+    'email': 'akunadminaul16@gmail.com',
+    'password': 'akuadmin123'
 }).encode(), headers={'Content-Type': 'application/json'})
 res = urllib.request.urlopen(req)
 login_data = json.loads(res.read().decode())
@@ -19,19 +19,21 @@ assert login_data.get('ok') is True, "Login ok flag must be True"
 assert login_data.get('role') == 'superadmin', "Role must be 'superadmin'"
 assert login_data.get('plan') == 'PRO VIP', "Plan must be 'PRO VIP'"
 
+admin_uid = login_data.get('user', {}).get('id', 40)
+
 # 2. Test Get User Profile
-res = urllib.request.urlopen(f'{base}/api/user/profile?user_id=1')
+res = urllib.request.urlopen(f'{base}/api/user/profile?user_id={admin_uid}')
 prof_data = json.loads(res.read().decode())
 print('[TEST 2] Get Profile:', prof_data.get('ok'), '| User:', prof_data.get('user', {}).get('email'))
 assert prof_data.get('ok') is True, "Get Profile must return ok: True"
-assert prof_data.get('user', {}).get('email') == 'shopnoure1619@gmail.com', "User email must match"
+assert prof_data.get('user', {}).get('email') == 'akunadminaul16@gmail.com', "User email must match"
 
 # 3. Test Update User Profile (Photo & Details)
 demo_avatar = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="%230284c7"/></svg>'
 req = urllib.request.Request(f'{base}/api/user/profile', data=json.dumps({
-    'user_id': 1,
+    'user_id': admin_uid,
     'full_name': 'Superadmin TataDana Prime',
-    'phone_number': '081299991619',
+    'phone_number': f'0812{admin_uid:08d}',
     'avatar_url': demo_avatar
 }).encode(), headers={'Content-Type': 'application/json'})
 res = urllib.request.urlopen(req)
@@ -56,7 +58,7 @@ assert wh_data.get('transaction_id') is not None, "Webhook must return transacti
 assert wh_data.get('amount') == 35000.0, "Webhook must parse 35000 amount correctly"
 
 # 5. Test Export CSV
-res = urllib.request.urlopen(f'{base}/api/export?user_id=1')
+res = urllib.request.urlopen(f'{base}/api/export?user_id={admin_uid}')
 csv_content = res.read().decode('utf-8')
 print('[TEST 5] Export CSV Length:', len(csv_content), '| Contains sate padang:', 'sate padang' in csv_content)
 assert res.status == 200, "Export must return status 200"

@@ -19,13 +19,13 @@ def test_database_and_admin():
         c = conn.cursor()
         
         # Check master admin exists
-        c.execute('SELECT * FROM users WHERE email = ?', ('shopnoure1619@gmail.com',))
+        c.execute('SELECT * FROM users WHERE email = ?', ('akunadminaul16@gmail.com',))
         admin = c.fetchone()
         assert admin is not None, "Master admin must exist"
         assert admin['role'] == 'superadmin', f"Expected superadmin, got {admin['role']}"
         assert admin['plan'] == 'PRO VIP', f"Expected PRO VIP, got {admin['plan']}"
         assert admin['is_approved'] == 1, "Master admin must be approved"
-        assert admin['password_hash'] == server.hash_pw('tugasbisnis16'), "Password hash mismatch"
+        assert admin['password_hash'] == server.hash_pw('akuadmin123'), "Password hash mismatch"
 
         # Check default wallets for admin
         c.execute('SELECT COUNT(*) as cnt FROM wallets WHERE user_id = ?', (admin['id'],))

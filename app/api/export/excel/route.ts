@@ -94,7 +94,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return new NextResponse(excelResult.buffer, {
+   return new NextResponse(excelResult.buffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',

@@ -28,3 +28,13 @@
    - Menampilkan seluruh menu secara komprehensif termasuk `Superadmin Desk`.
    - Mengaktifkan fitur persetujuan pendaftar baru (*Approval Workflow*), diagnostik basis data SQLite, dan kontrol failover gateway AI.
 
+## Kebijakan Keamanan Autentikasi & Form Login (Login Security & No Auto-Fill Guardrail)
+1. **Dilarang Menampilkan/Mengisi Otomatis Kredensial Admin (No Admin Auto-Fill)**:
+   - Pada halaman `/login`, modal login, atau kartu akses apapun, input email dan kata sandi dilarang keras diisi otomatis (*pre-filled*) dengan email admin (`shopnoure1619@gmail.com`) atau kata sandi admin.
+   - Atribut `value` pada input login harus selalu dikosongkan (`value=""`) dan hanya menggunakan petunjuk netral (`placeholder="Masukkan alamat email"` dan `placeholder="Masukkan kata sandi"`).
+   - Seluruh pengguna, termasuk Superadmin, wajib memasukkan kredensial autentikasi mereka secara manual untuk masuk ke sistem.
+2. **Integritas Sistem Riil & Eliminasi Total Data Tiruan (Strict Real System & Zero Dummy Policy)**:
+   - Dilarang membuat, memelihara, atau menyimulasikan data tiruan (*dummy/mock data*).
+   - Seluruh alur (pendaftaran akun, verifikasi OTP, antrean persetujuan admin, mutasi saldo multi-wallet, pencatatan transaksi masuk/keluar, dan laporan eksekutif) wajib mengeksekusi operasi database SQLite riil (`tatadana.db`) melalui backend Python (`server.py`).
+   - Perubahan data wajib persisten dan tidak boleh hilang setelah browser di-refresh atau server di-restart.
+

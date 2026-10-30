@@ -92,7 +92,7 @@ export async function GET(request: NextRequest) {
       });
     }
 
-    return new NextResponse(pdfResult.buffer, {
+    return new NextResponse(pdfResult.buffer as unknown as BodyInit, {
       status: 200,
       headers: {
         'Content-Type': 'application/pdf',

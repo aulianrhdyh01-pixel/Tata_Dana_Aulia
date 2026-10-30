@@ -1,7 +1,37 @@
+# Environment & secrets
 .env
 .env.local
-node_modules/
+.env.*.local
+
+# Python artifacts
 __pycache__/
-*.pyc
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+env.bak/
+venv.bak/
+
+# Node & Next.js artifacts
+node_modules/
+.next/
+out/
+build/
+
+# Vercel deployment cache
+.vercel/
+
+# OS & Editor
 .DS_Store
+Thumbs.db
 .vscode/
+.idea/
+
+# Binaries
+cloudflared.exe

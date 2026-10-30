@@ -384,3 +384,94 @@ PENTING DARI USER (dengan screenshot live):
    - Superadmin Desk (dNav-adminPanel) -> WAJIB TERSEMBUNYI (hidden) untuk User Biasa, dan HANYA MUNCUL untuk Admin/Superadmin.
 4. Pastikan .env memuat TELEGRAM_BOT_TOKEN="8957486024:AAGYrFIzM3QE8caHkkvpAQM1_otSg9BrtTQ" dan server.py menjalankan polling realtime serta handler /start sapaan resmi dan parser transaksi ke SQLite.
 Kerjakan dengan teliti dan cepat.
+
+
+## 2026-10-30T11:08:10Z
+
+Jalankan oleh 5 agen: Implementasi, perbaikan, dan pengujian sistem antarmuka TataDana Prime di localhost:3000 dengan pemisahan ketat antara Tampilan Superadmin dan Tampilan Pengguna (User), kredensial admin shopnoure1619@gmail.com / tugasbisnis16, penghilangan seluruh fitur admin di tampilan user, serta perbaikan alur registrasi dan approval gate di mana setelah verifikasi OTP pengguna baru wajib tertahan di Layar Menunggu Persetujuan Admin dan tidak boleh langsung masuk ke dashboard sampai disetujui (Approved) oleh Admin.
+
+Working directory: C:/Users/ASUS/.gemini/antigravity/scratch/tatadana
+Integrity mode: development
+
+---
+
+## Requirements
+
+### R1. Pemisahan Ketat Tampilan Admin vs Tampilan User
+- **Akun Superadmin**:
+  * Email resmi: shopnoure1619@gmail.com
+  * Password: tugasbisnis16
+  * Hanya Superadmin yang memiliki akses ke menu Superadmin Desk (#dNav-adminPanel dan #mNav-adminPanel) serta rute /admin.
+- **Tampilan User Pengguna**:
+  * Pengguna biasa wajib mendaftar terlebih dahulu.
+  * Pada tampilan sesi pengguna biasa, HILANGKAN SELURUH FITUR ADMIN: menu Superadmin Desk di sidebar desktop maupun mobile navbar wajib disembunyikan/dihilangkan secara total (hidden & display: none).
+  * Profil pengguna pada sidebar menampilkan identitas pengguna itu sendiri (nama, email, role: USER), bukan identitas superadmin.
+  * Proteksi Rute: Jika pengguna biasa mencoba membuka /admin melalui URL, sistem wajib menolak dengan kode status 403 Forbidden dan mengarahkan kembali ke /dashboard.
+
+### R2. Alur Registrasi & Approval Gate (Menunggu Persetujuan Admin)
+- Pendaftaran pengguna baru menyimpan data ke tabel users SQLite dengan is_approved = 0 dan mengarahkan ke /approval.
+- **Perbaikan Bug Autentikasi (Foto 2)**:
+  * Setelah pengguna memasukkan 6-digit kode OTP dan menekan tombol 'Lanjutkan', sistem memvalidasi OTP namun akun TIDAK BOLEH langsung masuk ke dashboard.
+  * Status akun tetap is_approved = 0 dan pengguna diarahkan ke Layar Menunggu Persetujuan Admin (Waiting for Admin Approval).
+  * Layar ini menampilkan identitas pendaftar, badge status "PENDING APPROVAL", pesan bahwa akun memerlukan otorisasi dari Superadmin (shopnoure1619@gmail.com), dan tombol interaktif "🔄 Periksa Status Persetujuan Admin" yang memanggil endpoint /api/auth/status.
+  * Selama akun belum disetujui (is_approved = 0), pengguna tidak dapat mengakses /dashboard atau /admin.
+
+### R3. Alur Otorisasi Persetujuan Admin (Approval Workflow di Superadmin Desk)
+- Superadmin shopnoure1619@gmail.com dapat melihat antrean pengguna baru yang menunggu persetujuan di tabel Superadmin Desk.
+- Superadmin dapat mengklik tombol "✓ Setujui Akun" untuk menyetujui akun pengguna secara persisten di SQLite (is_approved = 1).
+- Setelah disetujui oleh Superadmin, pengguna yang menekan tombol "Periksa Status Persetujuan" atau login kembali langsung dapat masuk ke Dashboard Pengguna (tanpa fitur admin).
+
+### R4. Operasional Server Localhost & Stabilitas Akses
+- Backend server Python (server.py) dan tunnel publik berjalan aktif di port 3000 tanpa error.
+- Seluruh rute SPA (/, /login, /approval, /dashboard, /admin) merespons dengan status 200.
+
+---
+
+## Acceptance Criteria
+
+### Verifikasi Pemisahan Tampilan Admin vs User
+- [ ] Login Superadmin dengan shopnoure1619@gmail.com / tugasbisnis16 berhasil masuk ke /admin dan menampilkan menu Superadmin Desk.
+- [ ] Pada sesi User Pengguna, menu Superadmin Desk di sidebar desktop dan mobile navbar hilang/disembunyikan sepenuhnya.
+- [ ] Mengakses rute /admin oleh User Pengguna diblokir dengan 403 Forbidden dan dialihkan ke /dashboard.
+- [ ] Profil pengguna di sidebar menampilkan identitas user pendaftar dengan lencana USER.
+
+### Verifikasi Approval Gate (Menunggu Persetujuan Admin)
+- [ ] Pendaftaran pengguna baru tersimpan di SQLite dengan is_approved = 0.
+- [ ] Setelah verifikasi OTP, pengguna tertahan di Layar Menunggu Persetujuan Admin dan TIDAK langsung masuk ke dashboard.
+- [ ] Layar Menunggu Persetujuan Admin menampilkan status akun dan tombol "Periksa Status Persetujuan Admin".
+- [ ] Akses langsung ke /dashboard oleh pengguna yang belum disetujui diblokir dan dikembalikan ke layar menunggu persetujuan.
+
+### Verifikasi Alur Approval Superadmin
+- [ ] Superadmin dapat melihat pengguna pending di antrean dan menekan tombol "✓ Setujui Akun".
+- [ ] Status pengguna berubah menjadi is_approved = 1 di basis data SQLite.
+- [ ] Setelah disetujui, pengguna dapat masuk ke Dashboard Pengguna dengan tampilan khusus user.
+
+
+## 2026-10-30T11:41:10Z
+
+Laporan Iterasi 4 diterima. Backend & frontend telah terverifikasi dengan hasil tes backend 100% lulus. Lanjutkan Milestone 4 (Adversarial Testing) dan Milestone 5 (Audit Forensik). Pastikan server localhost:3000 tetap stabil.
+
+
+## 2026-10-30T11:57:16Z
+
+Laporan Iterasi 6 diterima. Lanjutkan Milestone 5 (Audit Forensik) hingga tuntas dan siapkan proses evaluasi oleh Victory Auditor. Pastikan konsistensi database SQLite tatadana.db dan ketersediaan server localhost:3000 serta tunnel publik tetap terjaga.
+
+
+## 2026-10-30T12:05:43Z
+
+Laporan Iterasi 7 diterima. Forensic audit telah mengonfirmasi pemenuhan zero-mock dan kepatuhan penuh. Segera lanjutkan ke penugasan Victory Auditor untuk verifikasi independen akhir. Server dan tunnel tetap terpantau aktif.
+
+
+## 2026-10-30T12:11:59Z
+
+Laporan diterima. Proses audit independen oleh victory_auditor_r7_1 sedang dipantau. Pastikan seluruh kriteria R1 hingga R4 diverifikasi secara objektif.
+
+
+## 2026-10-30T12:16:40Z
+
+Laporan Iterasi 9 diterima. Kami menunggu hasil evaluasi Phase 2 dan Phase 3 serta vonis akhir dari victory_auditor_r7_1. Ketersediaan server port 3000 dan tunnel tetap dipantau aktif.
+
+
+## 2026-10-30T12:39:25Z
+
+Server dan background task telah di-restart dan seluruh 11 fitur telah lulus uji verifikasi 100%. Lanjutkan penyelesaian final audit oleh victory_auditor_r7_1 dan terbitkan laporan akhir.
