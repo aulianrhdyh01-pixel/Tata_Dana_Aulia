@@ -83,7 +83,7 @@ WIB = timezone(timedelta(hours=7))
 _initialized_dbs = set()
 
 def get_db(db_path=None):
-    target_path = db_path or resolve_db_path()
+    target_path = db_path or DB_FILE or resolve_db_path()
     os.makedirs(os.path.dirname(os.path.abspath(target_path)), exist_ok=True)
     conn = sqlite3.connect(target_path, timeout=30.0)
     conn.row_factory = sqlite3.Row
@@ -236,7 +236,7 @@ def parse_indonesian_nominal(raw_str):
             pass
     return 0.0
 
-def parse_natural_language_transaction(text, user_id=1):
+def parse_natural_language_transaction(text, user_id=1, db_conn=None):
     text = (text or '').strip()
     if not text:
         return None
@@ -313,7 +313,12 @@ def parse_natural_language_transaction(text, user_id=1):
     elif 'dana' in lower:
         target_wallet_keyword = 'dana'
 
-    conn = get_db()
+    should_close = False
+    if db_conn is not None:
+        conn = db_conn
+    else:
+        conn = get_db()
+        should_close = True
     c = conn.cursor()
 
     # Ensure user_id exists in users table to prevent FOREIGN KEY violation
@@ -346,7 +351,8 @@ def parse_natural_language_transaction(text, user_id=1):
         wallet_name = w_row['name']
         curr_bal = float(w_row['balance'] or 0.0)
 
-    conn.close()
+    if should_close:
+        conn.close()
 
     # Clean description
     desc = text
@@ -552,7 +558,7 @@ def process_telegram_incoming_message(token, msg):
     # 2. Handler for transaction text: parse [jenis] [nominal] [kategori] or natural language
     parsed_tx = parse_telegram_transaction_text(raw_text)
     if not parsed_tx:
-        parsed_tx = parse_natural_language_transaction(raw_text, user_id)
+        parsed_tx = parse_natural_language_transaction(raw_text, user_id, db_conn=conn)
 
     if not parsed_tx or parsed_tx['amount'] <= 0:
         reply_text = (
@@ -2160,7 +2166,7 @@ class TataDanaRequestHandler(http.server.SimpleHTTPRequestHandler):
             })
 
         # API: Generate Telegram Pairing Code (Requirement R2)
-        elif path == '/api/telegram/pairing-code':
+        elif path in ('/api/telegram/pairing-code', '/api/telegram/generate-pairing-code'):
             raw_uid = body.get('user_id') or body.get('userId')
             try:
                 user_id = int(raw_uid) if raw_uid else 1
